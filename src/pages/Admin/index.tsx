@@ -5,14 +5,74 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { useModel } from '@umijs/max';
-import { Button, Image, Switch, Tag } from 'antd';
+import { Button, Image, message, Modal, Popconfirm, Switch, Tag } from 'antd';
 import React, { useEffect } from 'react';
+import AdminForm from './components/adminForm';
 
 const AdminPage: React.FC = () => {
-  const { adminInfos, fetchAdminList } = useModel('adminModel');
+  const { adminInfos, fetchAdminList, deleteAdmin, updateAdmin } =
+    useModel('adminModel');
+  const [messageApi, contextHolder] = message.useMessage();
+  const [open, setOpen] = React.useState(false);
+  const [record, setRecord] = React.useState<Partial<IAdminInfos>>({});
+
   useEffect(() => {
     fetchAdminList();
   }, []);
+
+  const showModal = (record: IAdminInfos) => {
+    setOpen(true);
+    setRecord(record);
+  };
+
+  const handleOk = (params: Partial<IAdminInfos>, resetFields: () => void) => {
+    const newParams = {
+      ...params,
+      avatar: record.avatar,
+    };
+    updateAdmin(record._id as string, newParams).then(() => {
+      resetFields();
+      setOpen(false);
+      messageApi.open({
+        type: 'success',
+        content: '修改成功',
+      });
+    });
+  };
+
+  const handleCancel = () => {
+    setOpen(false);
+  };
+
+  const handleSwitchChange = async (value: boolean, row: IAdminInfos) => {
+    try {
+      await updateAdmin(row._id, { enabled: value });
+      messageApi.open({
+        type: 'success',
+        content: '修改成功',
+      });
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        content: '修改失败',
+      });
+    }
+  };
+
+  const handleDeleteAdmin = async (row: IAdminInfos) => {
+    try {
+      await deleteAdmin(row._id);
+      messageApi.open({
+        type: 'success',
+        content: '删除成功',
+      });
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        content: '删除失败',
+      });
+    }
+  };
 
   const columns: ProColumns<IAdminInfos>[] = [
     {
@@ -74,7 +134,7 @@ const AdminPage: React.FC = () => {
             size="small"
             key={record._id}
             checked={record.enabled === true}
-            onChange={() => {}}
+            onChange={(value) => handleSwitchChange(value, record)}
           />
         );
       },
@@ -86,12 +146,19 @@ const AdminPage: React.FC = () => {
       render: (_, record) => {
         return (
           <div key={record._id}>
-            <Button type="link" size="small">
+            <Button type="link" size="small" onClick={() => showModal(record)}>
               编辑
             </Button>
-            <Button type="link" size="small">
-              删除
-            </Button>
+            <Popconfirm
+              title="是否删除?"
+              onConfirm={() => handleDeleteAdmin(record)}
+              okText="是"
+              cancelText="否"
+            >
+              <Button type="link" size="small">
+                删除
+              </Button>
+            </Popconfirm>
           </div>
         );
       },
@@ -99,16 +166,32 @@ const AdminPage: React.FC = () => {
   ];
 
   return (
-    <PageContainer>
-      <ProTable<IAdminInfos>
-        headerTitle="查询表格"
-        dataSource={adminInfos}
-        columns={columns}
-        rowKey="_id"
-        search={false}
-        pagination={{ pageSize: 5 }}
-      />
-    </PageContainer>
+    <>
+      <PageContainer>
+        {contextHolder}
+        <ProTable<IAdminInfos>
+          headerTitle="查询表格"
+          dataSource={adminInfos}
+          columns={columns}
+          rowKey="_id"
+          search={false}
+          pagination={{ pageSize: 5 }}
+        />
+      </PageContainer>
+      <Modal
+        open={open}
+        title="修改管理员信息"
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <AdminForm
+          type="update"
+          adminInfo={record}
+          setAdminInfo={setRecord}
+          submit={handleOk}
+        />
+      </Modal>
+    </>
   );
 };
 

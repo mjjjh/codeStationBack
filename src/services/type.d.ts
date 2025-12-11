@@ -3,5 +3,7 @@ declare namespace API {
     success: boolean;
     errorMessage: string;
     data: T;
+    code: number;
+    msg: string;
   };
 }
