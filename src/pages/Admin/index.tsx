@@ -16,6 +16,8 @@ const AdminPage: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const [record, setRecord] = React.useState<Partial<IAdminInfos>>({});
 
+  const { initialState } = useModel('@@initialState');
+
   useEffect(() => {
     fetchAdminList();
   }, []);
@@ -127,7 +129,9 @@ const AdminPage: React.FC = () => {
       key: 'enabled',
       align: 'center',
       render: (_, record) => {
-        return (
+        return record._id === initialState?._id ? (
+          <Tag color="red">-</Tag>
+        ) : (
           <Switch
             checkedChildren="启用"
             unCheckedChildren="禁用"

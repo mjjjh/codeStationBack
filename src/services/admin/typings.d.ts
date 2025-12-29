@@ -7,3 +7,10 @@ export interface IAdminInfos {
   permission: number;
   _id: string;
 }
+
+export interface IAdminLoginInfos {
+  _id?: string;
+  loginId: string;
+  loginPwd: string;
+  captcha: string;
+}

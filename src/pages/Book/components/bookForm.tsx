@@ -27,11 +27,11 @@ const BookForm: React.FC<BookFormProps> = ({
 
   const editorRef = useRef<any>('');
 
-  const { typeInfos, fetchAdminList } = useModel('type');
+  const { typeInfos, fetchTypeList } = useModel('type');
 
   useEffect(() => {
     if (!typeInfos || typeInfos?.length === 0) {
-      fetchAdminList();
+      fetchTypeList();
     }
   }, []);
 
@@ -114,7 +114,7 @@ const BookForm: React.FC<BookFormProps> = ({
       <Form.Item<FormItem>
         label="书籍分类"
         name="typeId"
-        rules={[{ required: true, message: '请输入所需积分' }]}
+        rules={[{ required: true, message: '请选择书籍分类' }]}
       >
         <Select
           onChange={(value) => {
@@ -133,6 +133,7 @@ const BookForm: React.FC<BookFormProps> = ({
       <Form.Item
         label="书籍封面"
         name="bookPic"
+        valuePropName="bookPic"
         rules={[
           type === 'add' ? { required: true, message: '请上传书籍封面' } : {},
         ]}

@@ -9,7 +9,7 @@ import {
   ProColumns,
   ProTable,
 } from '@ant-design/pro-components';
-import { useNavigate } from '@umijs/max';
+import { Access, useAccess, useNavigate } from '@umijs/max';
 import { Button, Image, message, Popconfirm, Switch } from 'antd';
 import React, { useRef, useState } from 'react';
 
@@ -24,6 +24,8 @@ const User: React.FC = () => {
   });
 
   const navigate = useNavigate();
+
+  const access = useAccess();
 
   const tableRef = useRef<any>();
 
@@ -159,16 +161,18 @@ const User: React.FC = () => {
             >
               详情
             </Button>
-            <Popconfirm
-              title="是否删除?"
-              onConfirm={() => handleDeleteUser(record)}
-              okText="是"
-              cancelText="否"
-            >
-              <Button type="link" size="small">
-                删除
-              </Button>
-            </Popconfirm>
+            <Access accessible={access.SuperAdmin}>
+              <Popconfirm
+                title="是否删除?"
+                onConfirm={() => handleDeleteUser(record)}
+                okText="是"
+                cancelText="否"
+              >
+                <Button type="link" size="small">
+                  删除
+                </Button>
+              </Popconfirm>
+            </Access>
           </div>
         );
       },

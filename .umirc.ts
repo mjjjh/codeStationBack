@@ -24,6 +24,7 @@ export default defineConfig({
       name: '管理员',
       path: '/admin',
       icon: 'UserOutlined',
+      access: 'SuperAdmin',
       routes: [
         {
           name: '管理员列表',
@@ -86,8 +87,25 @@ export default defineConfig({
     {
       name: '面试题',
       path: '/interview',
-      component: './Interview',
       icon: 'EditOutlined',
+      routes: [
+        {
+          name: '面试题列表',
+          path: 'interviewList',
+          component: './Interview',
+        },
+        {
+          name: '添加面试题',
+          path: 'addInterview',
+          component: './Interview/addInterview',
+        },
+        {
+          name: '编辑面试题',
+          path: 'editInterview',
+          component: './Interview/addInterview',
+          hideInMenu: true,
+        },
+      ],
     },
     {
       name: '问答',
@@ -96,16 +114,35 @@ export default defineConfig({
       icon: 'ProfileOutlined',
     },
     {
+      name: '问答详情',
+      path: '/issueDetail',
+      component: './Issue/issueDetail',
+      hideInMenu: true,
+    },
+    {
       name: '评论',
       path: '/comment',
       component: './Comment',
       icon: 'CommentOutlined',
     },
     {
+      name: '评论详情',
+      path: '/commentDetail',
+      component: './Comment/commentDetail',
+      hideInMenu: true,
+    },
+    {
       name: '类型',
       path: '/type',
       component: './Type',
       icon: 'AppstoreOutlined',
+    },
+    {
+      name: '登录',
+      path: '/login',
+      component: './Login',
+      hideInMenu: true,
+      menuRender: false,
     },
   ],
   proxy: {
@@ -114,6 +151,10 @@ export default defineConfig({
       changeOrigin: true,
     },
     '/static': {
+      target: 'http://localhost:7001',
+      changeOrigin: true,
+    },
+    '/res': {
       target: 'http://localhost:7001',
       changeOrigin: true,
     },

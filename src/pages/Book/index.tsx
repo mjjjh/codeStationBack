@@ -1,21 +1,20 @@
 import { deleteBookApi, getBookListByPageApi } from '@/services/book';
 import { IBookInfos } from '@/services/book/typings';
-import { formatTime } from '@/utils/format';
+import { ITypeInfos } from '@/services/type/typings';
+import { formatSelectData, formatTime } from '@/utils/format';
 import {
   PageContainer,
   ProColumns,
   ProTable,
 } from '@ant-design/pro-components';
 import { useModel, useNavigate } from '@umijs/max';
-import { Button, Image, message, Modal, Popconfirm, Tag } from 'antd';
+import { Button, Image, message, Popconfirm, Select, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 type bookInfoType = Partial<IBookInfos>;
 
 const Book: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
-
-  const [open, setOpen] = React.useState(false);
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -26,11 +25,11 @@ const Book: React.FC = () => {
 
   const tableRef = useRef<any>();
 
-  const { typeInfos, fetchAdminList } = useModel('type');
+  const { typeInfos, fetchTypeList } = useModel('type');
 
   useEffect(() => {
     if (!typeInfos || typeInfos?.length === 0) {
-      fetchAdminList();
+      fetchTypeList();
     }
   }, []);
 
@@ -45,10 +44,6 @@ const Book: React.FC = () => {
         type: type,
       },
     });
-  };
-
-  const handleCancel = () => {
-    setOpen(false);
   };
 
   const handleDeleteBook = async (row: bookInfoType) => {
@@ -94,6 +89,14 @@ const Book: React.FC = () => {
           </Tag>
         );
       },
+      renderFormItem: (_, { value }) => {
+        return (
+          <Select
+            value={value}
+            options={formatSelectData(typeInfos as ITypeInfos[])}
+          ></Select>
+        );
+      },
     },
     {
       dataIndex: 'bookIntro',
@@ -107,7 +110,7 @@ const Book: React.FC = () => {
         if (str.length > 20) {
           return str.substring(0, 20) + '...';
         } else {
-          return record.bookIntro;
+          return str;
         }
       },
     },
@@ -207,14 +210,6 @@ const Book: React.FC = () => {
           }}
         />
       </PageContainer>
-      <Modal
-        open={open}
-        title="修改管理员信息"
-        onCancel={handleCancel}
-        footer={null}
-      >
-        {/* <AdminForm type="update" adminInfo={record} setAdminInfo={setRecord} submit={handleOk} /> */}
-      </Modal>
     </>
   );
 };
